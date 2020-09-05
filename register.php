@@ -5,8 +5,12 @@
     }
 
     if(isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])){
-        $status = $db->query("INSERT INTO users (`name`,`email`,`password`) VALUES ('".$_POST['name']."','".$_POST['email']."','".$_POST['password']."')");
-        
+        $status = mysqli_query($db, "INSERT INTO users (`name`,`email`,`password`,`created_at`) VALUES ('".$_POST['name']."','".$_POST['email']."','".$_POST['password']."','NOW()')");
+        if($status===true){
+           $_SESSION['success_message'] = "Account created successfully.";
+        }else{
+            $_SESSION['error_message'] = "Account creation failed. Maybe the email selected already exists.";
+        }
     }
 
 ?>
@@ -56,13 +60,16 @@
     <form class="form-signin" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
         <img class="mb-4" src="../assets/images/binod.png" alt="" width="72" height="72">
         <h1 class="h3 mb-3 font-weight-normal">Please sign up</h1>
-        <?php 
-        if(isset($_POST)  && !isset($status)){
-        ?>
-        <div style="color: red;">Error creating account. Please try again.</div>
-        <?php
-            }
-        ?>
+        <?php if(isset($_SESSION['success_message'])): ?>
+          <div class="alert alert-success"  style="margin-top: 10px;border-radius: 15px;"  role="alert">
+            <?php echo $_SESSION['success_message']; ?>
+          </div>
+        <?php endif; ?>
+        <?php if(isset($_SESSION['error_message'])): ?>
+          <div class="alert alert-danger" style="margin-top: 10px;border-radius: 15px;" role="alert">
+            <?php echo $_SESSION['error_message']; ?>
+          </div>
+        <?php endif; ?>
         <label for="inputName" class="sr-only">Full Name</label>
         <input type="text" name="name" id="inputName" class="form-control my-1" placeholder="Full Name" required autofocus>
         <label for="inputEmail" class="sr-only">Email address</label>
@@ -81,5 +88,9 @@
     <?php
         }
     ?>
+<?php 
+  unset($_SESSION['error_message']);
+  unset($_SESSION['success_message']);
+?>
 </body>
 </html>
